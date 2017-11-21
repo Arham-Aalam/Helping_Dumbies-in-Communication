@@ -20,26 +20,42 @@ class Recognize {
       return false;
   }
 
-  void feedGestures(PImage snap,color r,color g,color b){
+  String feedGestures(PImage snap,color r,color g,color b){
+    image(snap,width/2,height/3,snap.width,snap.height);
     int loc;
     color pixCol;
     HashMap<Character,Integer> colSet = new HashMap<Character,Integer>();
+    String str = "";
     snap.loadPixels();
+    float r11 = red(r);
+    float r12 = green(r);
+    float r13 = blue(r);
+      float g11 = red(g);
+      float g12 = green(g);
+      float g13 = blue(g);
+        float b11 = red(b);
+        float b12 = green(b);
+        float b13 = blue(b);
+      
     for(int x=0;x<snap.width;x++){
      for(int y=0;y<snap.height;y++){
        loc = x + y * snap.width;
        pixCol = snap.pixels[loc];
-       if(abs(pixCol - r) <= 25 && !colSet.containsKey('R')){
+      float r2 = red(pixCol);
+      float g2 = green(pixCol);
+      float b2 = blue(pixCol);
+       if(dist(r11,r12,r13,r2,g2,b2) <= 25 && !colSet.containsKey('R')){
          colSet.put('R',1);
-       }else if(abs(pixCol - g) <= 25 && !colSet.containsKey('G')){
+         str += "R";
+       }else if(dist(g11,g12,g13,r2,g2,b2) <= 25 && !colSet.containsKey('G')){
          colSet.put('G',1);
-       }else if(abs(pixCol - b) <= 25 && !colSet.containsKey('B')){
+         str += "G";
+       }else if(dist(b11,b12,b13,r2,g2,b2) <= 25 && !colSet.containsKey('B')){
          colSet.put('B',1);
+         str += "B";
        }
      }
     }
-    if(!colSet.isEmpty())
-      println(colSet);
+      return str;
   }
-  
 }

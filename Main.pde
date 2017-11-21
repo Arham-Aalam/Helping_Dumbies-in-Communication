@@ -8,6 +8,7 @@ Capture video;
 
 // A variable for the color we are searching for.
 color trackColor,redFing,greenFing,blueFing,recCol; 
+String h;
 
 // All variable and buildIn datatypes declearations
 int ch,globLoc,displayCnt,recogW,recogH;
@@ -58,15 +59,18 @@ void captureEvent(Capture video) {
     globLoc = width/2 + (width/12)*video.width;
     traceGreen = video.pixels[globLoc];
     globLoc = (width/2)+(width/3) + (width/12)*video.width;
-    traceBlue = video.pixels[globLoc];
-     
+    traceBlue = video.pixels[globLoc]; 
 }
   if(ch == 2){
   // recognition
+ 
   recogImg.copy(video,(int)recogX,(int)recogY,recogW,recogH,0,0,recogImg.width,recogImg.height);
-  recCol = recogW/2 + recogH/2 * recogImg.width;
+  recogImg.loadPixels();
+  recCol = recogImg.pixels[recogW/2 + recogH/2 * recogImg.width];
+  
   boxDifOn = true;
   }
+  
   // copy prev capture each times
   prev.copy(video,0,0,video.width,video.height,0,0,prev.width,prev.height);
   prev.updatePixels();
@@ -173,9 +177,22 @@ void draw() {
       stroke(51);
       strokeWeight(2);
       rect(recogX,recogY,recogW,recogH);
+      /*
       if(boxDifOn && rec.colorDiff(recCol,recogW/2,recogH/2,recogImg)){
-        rec.feedGestures(recogImg,redFing,greenFing,blueFing);
-      }
+        println(rec.feedGestures(recogImg,redFing,greenFing,blueFing));
+        ch = 10;  
+    }
+    */
+    h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
+    if(h.length() == 0){
+        h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
+    }if(h.length() > 0){
+       println(h);
+      if(h.length() == 3){ 
+       ch = 10;
+        h = "";
+    }
+    }
  }
  //color recognition Ends here
 }
