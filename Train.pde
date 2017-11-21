@@ -51,9 +51,8 @@ class Train{
       float b2 = blue(track);
       float d = dist(r1,g1,b1,r2,g2,b2);
       if(d > threshold){
-        noFill();
-        stroke(0,0,255);
-        rect(x_,y_,10,10);
+        fill(tCol);
+        rect(x_,y_,20,20);
         return tCol;
       }
       return -1;
