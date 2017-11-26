@@ -21,11 +21,10 @@ class Recognize {
   }
 
   String feedGestures(PImage snap,color r,color g,color b){
-    image(snap,width/2,height/3,snap.width,snap.height);
+    String str = "";
     int loc;
     color pixCol;
     HashMap<Character,Integer> colSet = new HashMap<Character,Integer>();
-    String str = "";
     snap.loadPixels();
     float r11 = red(r);
     float r12 = green(r);
@@ -47,15 +46,40 @@ class Recognize {
        if(dist(r11,r12,r13,r2,g2,b2) <= 25 && !colSet.containsKey('R')){
          colSet.put('R',1);
          str += "R";
-       }else if(dist(g11,g12,g13,r2,g2,b2) <= 25 && !colSet.containsKey('G')){
+       }else if(dist(g11,g12,g13,r2,g2,b2) <= 20 && !colSet.containsKey('G')){
          colSet.put('G',1);
          str += "G";
-       }else if(dist(b11,b12,b13,r2,g2,b2) <= 25 && !colSet.containsKey('B')){
+       }else if(dist(b11,b12,b13,r2,g2,b2) <= 20 && !colSet.containsKey('B')){
          colSet.put('B',1);
          str += "B";
        }
      }
     }
+     textSize(20);
+    fill(0,0,255);
+    text(str,width/2,height/3);
       return str;
   }
+  
+  boolean isDiff(PImage preSnap,PImage crrSnap){
+    preSnap.loadPixels();
+    crrSnap.loadPixels();
+    for(int x=0;x<preSnap.width;x++){
+       for(int y=0;y<preSnap.height;y++){
+           int loc = x + y * preSnap.width;
+           color preCol = preSnap.pixels[loc];
+           color crrCol = crrSnap.pixels[loc];
+           float r1 = red(preCol);
+           float g1 = green(preCol);
+           float b1 = blue(preCol);
+           float r2 = red(crrCol);
+           float g2 = green(crrCol);
+           float b2 = blue(crrCol);
+           if(dist(r1,g1,b1,r2,g2,b2) > 10)
+             return true;
+       }
+    }
+      return false;
+  }
+  
 }

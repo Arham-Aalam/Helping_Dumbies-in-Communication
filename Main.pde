@@ -1,21 +1,26 @@
-
-PImage prev;
-PImage startImg,recogImg;
+// arham lookat http://ubaa.net/shared/processing/opencv/opencv_roi.html
 import processing.video.*;
 import java.lang.Exception;
 // Variable for capture device
 Capture video;
+Movie movie;
 
 // A variable for the color we are searching for.
 color trackColor,redFing,greenFing,blueFing,recCol; 
-String h;
+
+int i =0,j=0,activation = 0;
+PImage prev,preBox;
+PImage startImg,recogImg,crrBox;
 
 // All variable and buildIn datatypes declearations
 int ch,globLoc,displayCnt,recogW,recogH;
 color traceRed,traceGreen,traceBlue;
-boolean red = false,green = false,blue = false,boxDifOn = false;
+boolean red = false,green = false,blue = false,boxPC = false;
 float recogX,recogY;
 double recPercent;
+
+//Example variables
+int examVI = -1;
 
 //User define classes declearation
 Manu m1;
@@ -48,7 +53,14 @@ void setup() {
   recogW = width/3+60;
   recogH = width/3+60;
   recogImg = createImage(recogW,recogH,RGB);
+  crrBox = createImage(recogW,recogH,RGB);
+  preBox = createImage(recogW,recogH,RGB);
   rec = new Recognize();
+//  movie = new Movie(this, "exampleVideo.mp4");
+}
+
+void movieEvent(Movie m) {
+  m.read();
 }
 
 void captureEvent(Capture video) {
@@ -63,12 +75,16 @@ void captureEvent(Capture video) {
 }
   if(ch == 2){
   // recognition
- 
-  recogImg.copy(video,(int)recogX,(int)recogY,recogW,recogH,0,0,recogImg.width,recogImg.height);
+  recogImg.copy(video,(int)recogX,(int)recogY,recogW,recogH,0,0,recogImg.width,recogImg.height); 
   recogImg.loadPixels();
-  recCol = recogImg.pixels[recogW/2 + recogH/2 * recogImg.width];
-  
-  boxDifOn = true;
+   recCol = recogImg.pixels[recogW/2 + recogH/2 * recogImg.width];
+  if(j < 15){
+  j++;
+  }else if(j == 15) {
+  crrBox.copy(video,(int)recogX,(int)recogY,recogW,recogH,0,0,crrBox.width,crrBox.height);
+  crrBox.updatePixels();
+    j = 0;
+  }
   }
   
   // copy prev capture each times
@@ -76,6 +92,7 @@ void captureEvent(Capture video) {
   prev.updatePixels();
   // Read image from the camera
   video.read();
+  
   
 }
 
@@ -94,11 +111,9 @@ void draw() {
      if(m1.choice(video,prev) == 1){
        println("Train button pressed");
        ch = 1;
-       if(red && green && blue){
-          textSize(30);
-         fill(255,10,10);
-         text("You have already shown all the colors",50,height/2);
-       }
+         red = false;
+         blue = false;
+         green = false;
      }
      else if(m1.choice(video,prev) == 2){
        println("recognize button pressed");
@@ -116,7 +131,8 @@ void draw() {
         
      }else if(m1.choice(video,prev) == 3){
        println("result button pressed");
-       ch = 10;
+       ch = 3;
+       examVI = -1;
      } 
     }
   // ends menu
@@ -166,10 +182,20 @@ void draw() {
           ch = 0;
           
       }
+      if(ch == 12){
+        // for some delay after examples
+        textSize(30);
+        fill(150, 50, 50);
+        text("Please wait Loading Manu....",width/6,3 * height/4);
+        displayCnt++;
+        if(displayCnt == 301)
+          ch = 0;
+          
+      }
     
     //track color - recognition part
-    
     if(ch == 2){
+      ColSets cols = new ColSets();
       textSize(32);
       fill(0,0,255);
       text("show gestures in the below Box",recogX+20,40);
@@ -177,24 +203,54 @@ void draw() {
       stroke(51);
       strokeWeight(2);
       rect(recogX,recogY,recogW,recogH);
-      /*
-      if(boxDifOn && rec.colorDiff(recCol,recogW/2,recogH/2,recogImg)){
-        println(rec.feedGestures(recogImg,redFing,greenFing,blueFing));
-        ch = 10;  
-    }
-    */
-    h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
-    if(h.length() == 0){
-        h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
-    }if(h.length() > 0){
-       println(h);
-      if(h.length() == 3){ 
-       ch = 10;
-        h = "";
+    
+    if(j == 0 && !rec.isDiff(recogImg, crrBox)){
+      String h = "";
+       h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
+     if(h.length() == 0)
+         activation = 0;
+     else if(h.length() > 0){
+       activation++;    // for recognizing three times then activating
+       println(activation);
+       if(activation == 3){
+         activation = 0;
+         String expS = cols.showWord(cols.matchIt(h));
+         if(expS != "/")
+           println(expS);
+       }
     }
     }
  }
  //color recognition Ends here
+ 
+ //Exaples starts here
+ if(ch == 3){
+     textSize(32);
+     fill(255,10,10);
+     text("Choose the examples",50,height/12);
+     // menu code for examples
+     m1.showExaples();
+       
+     if(m1.choice(video,prev,2) == 1 || examVI == 1){
+       examVI = 1;
+         //image(movie,width/3,20,width/3,width/3);
+         //movie.play();
+     }
+     else if(m1.choice(video,prev,2) == 2 || examVI == 2){
+       examVI = 2;
+         textSize(32);
+     fill(255,10,10);
+     text("Nothing",50,height/2);   
+     }
+     if(examVI != -1){
+         m1.showExit();
+         if(m1.choice(video,prev,-1) == 3){
+           ch = 12;
+           displayCnt = 0;  
+       }
+     }
+ }
+ 
 }
 
 void mousePressed(){
