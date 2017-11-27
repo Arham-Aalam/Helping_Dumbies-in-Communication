@@ -43,19 +43,19 @@ class Recognize {
       float r2 = red(pixCol);
       float g2 = green(pixCol);
       float b2 = blue(pixCol);
-       if(dist(r11,r12,r13,r2,g2,b2) <= 25 && !colSet.containsKey('R')){
+       if(dist(r11,r12,r13,r2,g2,b2) <= 35 && !colSet.containsKey('R')){
          colSet.put('R',1);
          str += "R";
-       }else if(dist(g11,g12,g13,r2,g2,b2) <= 20 && !colSet.containsKey('G')){
+       }else if(dist(g11,g12,g13,r2,g2,b2) <= 35 && !colSet.containsKey('G')){
          colSet.put('G',1);
          str += "G";
-       }else if(dist(b11,b12,b13,r2,g2,b2) <= 20 && !colSet.containsKey('B')){
+       }else if(dist(b11,b12,b13,r2,g2,b2) <= 35 && !colSet.containsKey('B')){
          colSet.put('B',1);
          str += "B";
        }
      }
     }
-     textSize(20);
+       textSize(20);
     fill(0,0,255);
     text(str,width/2,height/3);
       return str;

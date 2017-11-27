@@ -6,11 +6,13 @@ Capture video;
 Movie movie;
 
 // A variable for the color we are searching for.
-color trackColor,redFing,greenFing,blueFing,recCol; 
+color trackColor,redFing,greenFing,blueFing,recCol;
 
 int i =0,j=0,activation = 0;
 PImage prev,preBox;
 PImage startImg,recogImg,crrBox;
+
+String preExpS = new String("");
 
 // All variable and buildIn datatypes declearations
 int ch,globLoc,displayCnt,recogW,recogH;
@@ -78,9 +80,9 @@ void captureEvent(Capture video) {
   recogImg.copy(video,(int)recogX,(int)recogY,recogW,recogH,0,0,recogImg.width,recogImg.height); 
   recogImg.loadPixels();
    recCol = recogImg.pixels[recogW/2 + recogH/2 * recogImg.width];
-  if(j < 15){
+  if(j < 25){
   j++;
-  }else if(j == 15) {
+  }else if(j == 25) {
   crrBox.copy(video,(int)recogX,(int)recogY,recogW,recogH,0,0,crrBox.width,crrBox.height);
   crrBox.updatePixels();
     j = 0;
@@ -102,7 +104,7 @@ void draw() {
   image(video,0,0);
   //default starting of programe
     if(ch == 10){
-      image(startImg,width/3,height/3,width/3,width/3);
+      image(startImg,video.width/3,video.height/3,video.width/3,video.width/3);
     }
     
     // gives manus
@@ -195,6 +197,7 @@ void draw() {
     
     //track color - recognition part
     if(ch == 2){
+      
       ColSets cols = new ColSets();
       textSize(32);
       fill(0,0,255);
@@ -214,12 +217,22 @@ void draw() {
        println(activation);
        if(activation == 3){
          activation = 0;
+         preExpS = "";
          String expS = cols.showWord(cols.matchIt(h));
-         if(expS != "/")
-           println(expS);
+         preExpS += expS;
+         if(expS != "/"){
+           println(preExpS);
+            textSize(30);
+            fill(0,0,255);
+            text(preExpS,width/2,height/3);
+         }
        }
     }
     }
+            textSize(20);
+            fill(255,0,0);
+            text(preExpS,2 * width/3,height/2);
+            
  }
  //color recognition Ends here
  
