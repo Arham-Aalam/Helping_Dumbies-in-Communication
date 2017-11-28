@@ -1,18 +1,23 @@
-// arham lookat http://ubaa.net/shared/processing/opencv/opencv_roi.html
+
 import processing.video.*;
 import java.lang.Exception;
 // Variable for capture device
 Capture video;
+AudioSpeech as;
 Movie movie;
+
+// for taking some time
+boolean takeTime = false;
 
 // A variable for the color we are searching for.
 color trackColor,redFing,greenFing,blueFing,recCol;
 
-int i =0,j=0,activation = 0;
+int i =0,j=0,activation1 = 0,activation2 = 0,chBox;
 PImage prev,preBox;
 PImage startImg,recogImg,crrBox;
 
 String preExpS = new String("");
+String gesM2 = new String("");
 
 // All variable and buildIn datatypes declearations
 int ch,globLoc,displayCnt,recogW,recogH;
@@ -57,7 +62,11 @@ void setup() {
   recogImg = createImage(recogW,recogH,RGB);
   crrBox = createImage(recogW,recogH,RGB);
   preBox = createImage(recogW,recogH,RGB);
-  rec = new Recognize();
+  rec = new Recognize(40,height/10,180,40,(width/5)+(width/6),height/10,180,40,3*(width/4),height/10);
+  chBox = 0;
+  
+  // text to audio object
+  as = new AudioSpeech();
 //  movie = new Movie(this, "exampleVideo.mp4");
 }
 
@@ -101,7 +110,10 @@ void captureEvent(Capture video) {
 void draw() {
   video.loadPixels();
   prev.loadPixels();
-  image(video,0,0);
+  
+  if(!takeTime)
+    image(video,0,0);
+  
   //default starting of programe
     if(ch == 10){
       image(startImg,video.width/3,video.height/3,video.width/3,video.width/3);
@@ -168,55 +180,73 @@ void draw() {
       if(ch == 11){
         textSize(30);
         fill(150, 50, 50);
-        text("Successfully picked all three colors", width/6,height/4);
+        text("Successfully picked all three colors", video.width/6,video.height/4);
         fill(redFing);
-        rect(width/6,height/2,50,50);
+        rect(video.width/6,video.height/2,50,50);
         fill(greenFing);
-        rect(width/2,height/2,50,50);
+        rect(video.width/2,video.height/2,50,50);
         fill(blueFing);
-        rect((width/2)+(width/3),height/2,50,50);
+        rect((video.width/2)+(video.width/3),video.height/2,50,50);
         // for some delay
         textSize(30);
         fill(150, 50, 50);
-        text("Please wait Loading Manu....",width/6,3 * height/4);
+        text("Please wait Loading Manu....",video.width/6,3 * video.height/4);
         displayCnt++;
-        if(displayCnt == 301)
+        if(displayCnt == 301){
           ch = 0;
-          
+         displayCnt = 0; 
+        }
       }
       if(ch == 12){
         // for some delay after examples
         textSize(30);
         fill(150, 50, 50);
-        text("Please wait Loading Manu....",width/6,3 * height/4);
+        text("Please wait Loading Manu....",video.width/6,3 * video.height/4);
         displayCnt++;
-        if(displayCnt == 301)
+        if(displayCnt == 301){
           ch = 0;
-          
+          displayCnt = 0;
+      }
       }
     
     //track color - recognition part
     if(ch == 2){
-      
-      ColSets cols = new ColSets();
       textSize(32);
-      fill(0,0,255);
+      fill(255,0,0);
       text("show gestures in the below Box",recogX+20,40);
       noFill();
-      stroke(51);
+      stroke(0,0,255);
       strokeWeight(2);
       rect(recogX,recogY,recogW,recogH);
+      textSize(22);
+      fill(0,0,255);
+      text(chBox +" gesture recognition Mode",recogX+20,recogY-30);
+      ColSets cols = new ColSets();
     
+    //show options for boxes and get the choice
+    rec.showOpt();
+    if(m1.choice(video, prev,rec) == 1)
+      chBox = 2;
+    else if(m1.choice(video, prev,rec) == 2)
+      chBox = 1;
+    else if(m1.choice(video, prev,rec) == 3){
+      chBox = 0;
+      ch = 12;
+      takeTime = false;
+    }
+
     if(j == 0 && !rec.isDiff(recogImg, crrBox)){
-      String h = "";
+      if(chBox == 1){  // if user want to make one window or box gestures
+    
+      String h = new String("");
        h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
      if(h.length() == 0)
-         activation = 0;
+         activation1 = 0;
      else if(h.length() > 0){
-       activation++;    // for recognizing three times then activating
-       println(activation);
-       if(activation == 3){
-         activation = 0;
+           // for recognizing three times then activating
+       println(activation1);
+       if(activation1 == 3){
+         activation1 = 0;
          preExpS = "";
          String expS = cols.showWord(cols.matchIt(h));
          preExpS += expS;
@@ -227,11 +257,55 @@ void draw() {
             text(preExpS,width/2,height/3);
          }
        }
+       activation1++;
+       h.replaceAll("[a-zA-Z]","");
     }
+    }else if(chBox == 2){ // if user want to make two box gestures
+      
+      String h = new String("");
+      h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
+     if(h.length() == 0){
+         activation2 = 0;
+         takeTime = false;  
+   }
+     else if(h.length() > 0){
+           // for recognizing three times then activating
+       println(activation2);
+       if(activation2 == 3){
+         activation2 = 0;
+         preExpS = "";
+         String expCh = cols.matchIt(h);
+         if(expCh != "/"){
+           gesM2 += expCh;
+         }
+         takeTime = true;
+         // shows one gesture is recognize
+         for(int ii=0;ii<255;ii++){
+            fill(15,0,255);
+            rect(0,0,video.width,video.height);
+            textSize(25);
+            fill(255,0,0);
+            text("Gesture recognized!",width/3,height/2);
+         }
+       }
+       if(gesM2.length() == 2){
+         preExpS = cols.showWord(gesM2);
+         println(gesM2);
+         gesM2 = "";
+         as.speakString(preExpS);
+       }
+
+       activation2++;
+       h.replaceAll("[a-zA-Z]","");
+    }
+
+    }
+
     }
             textSize(20);
             fill(255,0,0);
-            text(preExpS,2 * width/3,height/2);
+            if(preExpS != "/")
+            text(preExpS,2 * width/3,height/2+30);
             
  }
  //color recognition Ends here
@@ -269,4 +343,3 @@ void draw() {
 void mousePressed(){
   ch = 0;
 }
-  

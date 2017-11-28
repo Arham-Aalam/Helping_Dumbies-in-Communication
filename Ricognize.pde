@@ -1,6 +1,28 @@
 import java.util.HashMap;
-
 class Recognize {
+int b1x,b1y,b1w,b1h,b2x,b2y,b2w,b2h,exitX,exitY;
+  Buttons bb1,bb2,bb3;  
+    Recognize(int b1x,int b1y,int b1w,int b1h,int b2x,int b2y,int b2w,int b2h,int exitX,int exitY){
+      this.bb1 = new Buttons("double Mode",b1x,b1y,b1w,b1h);
+      this.bb2 = new Buttons("single Mode",b2x,b2y,b2w,b2h);
+      this.bb3 = new Buttons("Exit",exitX,exitY);
+      this.b1x = b1x;
+      this.b1y = b1y;
+      this.b1w = b1w;
+      this.b1h = b1h;
+      this.b2x = b2x;
+      this.b2y = b2y;
+      this.b2w = b2w;
+      this.b2h = b2h;
+      this.exitX  = exitX;
+      this.exitY = exitY;
+    }
+    
+    void showOpt(){
+       bb1.drawButton();
+       bb2.drawButton();
+       bb3.drawButton();
+    }
     
    boolean colorDiff(color track,int x_,int y_,PImage snap){
      snap.loadPixels();
