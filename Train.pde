@@ -40,7 +40,7 @@ class Train{
   }  
 }
   color colorPicker(color track,int x_,int y_){
-    int threshold = 150;
+    int threshold = 100;
      int Loc = x_+y_*video.width;
     color tCol = video.pixels[Loc];
       float r1 = red(tCol);

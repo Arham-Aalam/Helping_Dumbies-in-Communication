@@ -1,6 +1,5 @@
 
 import processing.video.*;
-import java.lang.Exception;
 // Variable for capture device
 Capture video;
 AudioSpeech as;
@@ -42,7 +41,7 @@ void setup() {
   video.start();
   // Start off tracking for red
   trackColor = color(0, 0, 255);
-  println(cam[0]);
+  //println(cam[0]);
   ch = 10;
   prev = createImage(width,height,RGB);
   startImg = loadImage("start.png");
@@ -240,12 +239,14 @@ void draw() {
     
       String h = new String("");
        h = rec.feedGestures(recogImg,redFing,greenFing,blueFing);
-     if(h.length() == 0)
+     if(h.length() == 0){
          activation1 = 0;
+         takeTime = false;   
+     }
      else if(h.length() > 0){
            // for recognizing three times then activating
        println(activation1);
-       if(activation1 == 3){
+       if(activation1 == 4){
          activation1 = 0;
          preExpS = "";
          String expS = cols.showWord(cols.matchIt(h));
@@ -256,10 +257,22 @@ void draw() {
             fill(0,0,255);
             text(preExpS,width/2,height/3);
          }
+         takeTime = true;
+         // shows one gesture is recognize
+         for(int ii=0;ii<75;ii++){
+            fill(15,0,255);
+            rect(0,0,video.width,video.height);
+            textSize(25);
+            fill(255,0,0);
+            text("Gesture recognized!",width/3,height/2);
+         }
+         if(preExpS != "/")
+            as.speakString(preExpS);
        }
        activation1++;
-       h.replaceAll("[a-zA-Z]","");
+       h = "";
     }
+    activation2 = 0;
     }else if(chBox == 2){ // if user want to make two box gestures
       
       String h = new String("");
@@ -292,13 +305,14 @@ void draw() {
          preExpS = cols.showWord(gesM2);
          println(gesM2);
          gesM2 = "";
+         if(preExpS != "/" && preExpS != "//")
          as.speakString(preExpS);
        }
 
        activation2++;
-       h.replaceAll("[a-zA-Z]","");
+       h = "";
     }
-
+      activation1 = 0;
     }
 
     }
@@ -323,7 +337,7 @@ void draw() {
          //image(movie,width/3,20,width/3,width/3);
          //movie.play();
      }
-     else if(m1.choice(video,prev,2) == 2 || examVI == 2){
+      if(m1.choice(video,prev,2) == 2 || examVI == 2){
        examVI = 2;
          textSize(32);
      fill(255,10,10);
