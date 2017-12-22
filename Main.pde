@@ -13,7 +13,7 @@ color trackColor,redFing,greenFing,blueFing,recCol;
 
 int i =0,j=0,activation1 = 0,activation2 = 0,chBox;
 PImage prev,preBox;
-PImage startImg,recogImg,crrBox;
+PImage startImg,recogImg,crrBox,exampleImg1,exampleImg2;
 
 String preExpS = new String("");
 String gesM2 = new String("");
@@ -27,6 +27,7 @@ double recPercent;
 
 //Example variables
 int examVI = -1;
+char exmKey = 'B';
 
 //User define classes declearation
 Manu m1;
@@ -67,6 +68,10 @@ void setup() {
   // text to audio object
   as = new AudioSpeech();
 //  movie = new Movie(this, "exampleVideo.mp4");
+
+// for example images
+exampleImg1 = loadImage("examples/A.jpeg");
+exampleImg2 = loadImage("examples/upload.png");
 }
 
 void movieEvent(Movie m) {
@@ -319,13 +324,16 @@ void draw() {
             textSize(20);
             fill(255,0,0);
             if(preExpS != "/")
-            text(preExpS,2 * width/3,height/2+30);
+            text(preExpS,2 * width/3-40,height/2+30);
             
  }
  //color recognition Ends here
  
  //Exaples starts here
  if(ch == 3){
+   //reading pixels
+   color examplePic1 = video.pixels[width/5 + (2*height/3+50)*video.width];
+   
      textSize(32);
      fill(255,10,10);
      text("Choose the examples",50,height/12);
@@ -336,13 +344,29 @@ void draw() {
        examVI = 1;
          //image(movie,width/3,20,width/3,width/3);
          //movie.play();
+         // show various categories
+         if(cate == 1){ // for hospital
+           textSize(32);
+           fill(255,10,10);
+           text(cols.showWord("A"),50,height/12);
+           text(cols.showWord("A"),50,height/10);
+           text(cols.showWord("A"),50,height/8);
+         }else if(cate == 2){ // for school
+           
+         }
      }
       if(m1.choice(video,prev,2) == 2 || examVI == 2){
        examVI = 2;
-         textSize(32);
-     fill(255,10,10);
-     text("Nothing",50,height/2);   
-     }
+         image(exampleImg1,width/10,height/3,200,200);
+         image(exampleImg2,width/5,2*height/3+20,50,50);
+         color examplePic2 = video.pixels[width/5 + (2*height/3+50)*video.width];
+         if(dist(red(examplePic2),blue(examplePic2),green(examplePic2),red(examplePic1),blue(examplePic2),green(examplePic2)) > 20){
+           exampleImg1 = loadImage("examples/"+exmKey+".jpeg");
+           exmKey++;
+           if(exmKey == 'P')
+             exmKey = 'A';
+         }
+   }
      if(examVI != -1){
          m1.showExit();
          if(m1.choice(video,prev,-1) == 3){
