@@ -1,4 +1,4 @@
-# Helping_Dumbies-in-Communicatio
+# Helping_Dumbies-in-Communication
 
 ## -Lets’s Expression Speak.
 
