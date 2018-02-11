@@ -5,7 +5,7 @@ class Manu{
       b2 = new Buttons("Recognize",(width/5)+(width/6),height/10);
       b3 = new Buttons("Exaples",3*(width/4),height/10);
        //for examples
-      b4 = new Buttons("Video",50,height/10);
+      b4 = new Buttons("Text",50,height/10);
       b5 = new Buttons("Images",(width/5)+(width/6),height/10);
       b6 = new Buttons("Exit",3*(width/4),height/10);
  }

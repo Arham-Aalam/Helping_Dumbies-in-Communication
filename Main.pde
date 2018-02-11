@@ -10,9 +10,10 @@ boolean takeTime = false;
 
 // A variable for the color we are searching for.
 color trackColor,redFing,greenFing,blueFing,recCol;
+ColSets cols;
 
 int i =0,j=0,activation1 = 0,activation2 = 0,chBox;
-PImage prev,preBox;
+PImage prev,preBox,swipL;
 PImage startImg,recogImg,crrBox,exampleImg1,exampleImg2;
 
 String preExpS = new String("");
@@ -26,7 +27,7 @@ float recogX,recogY;
 double recPercent;
 
 //Example variables
-int examVI = -1;
+int examVI = -1,cate = 1;
 char exmKey = 'B';
 
 //User define classes declearation
@@ -64,6 +65,7 @@ void setup() {
   preBox = createImage(recogW,recogH,RGB);
   rec = new Recognize(40,height/10,180,40,(width/5)+(width/6),height/10,180,40,3*(width/4),height/10);
   chBox = 0;
+  cols = new ColSets();
   
   // text to audio object
   as = new AudioSpeech();
@@ -72,6 +74,7 @@ void setup() {
 // for example images
 exampleImg1 = loadImage("examples/A.jpeg");
 exampleImg2 = loadImage("examples/upload.png");
+swipL = loadImage("examples/back.png");
 }
 
 void movieEvent(Movie m) {
@@ -333,34 +336,81 @@ void draw() {
  if(ch == 3){
    //reading pixels
    color examplePic1 = video.pixels[width/5 + (2*height/3+50)*video.width];
-   
+   color examplePic11 = video.pixels[20 + (height/2)*video.width];
      textSize(32);
      fill(255,10,10);
      text("Choose the examples",50,height/12);
      // menu code for examples
      m1.showExaples();
-       
+       color examplePic2;
      if(m1.choice(video,prev,2) == 1 || examVI == 1){
        examVI = 1;
          //image(movie,width/3,20,width/3,width/3);
          //movie.play();
          // show various categories
+         examplePic2 = video.pixels[20 + (height/2)*video.width];
          if(cate == 1){ // for hospital
            textSize(32);
-           fill(255,10,10);
-           text(cols.showWord("A"),50,height/12);
-           text(cols.showWord("A"),50,height/10);
-           text(cols.showWord("A"),50,height/8);
+           fill(150,10,40);
+           text("Hospital",50,height/3-30);
+           textSize(18);
+           text("I = "+cols.showWord("I"),50,height/3);
+           text("J = "+cols.showWord("J"),50,height/3+20);
+           text("K = "+cols.showWord("K"),50,height/3+60);
+           text("IJ = "+cols.showWord("IJ"),50,height/3+80);
+           text("IK = "+cols.showWord("IK"),50,height/3+100);
+           text("JI = "+cols.showWord("JI"),50,height/3+120);
+           text("JL = "+cols.showWord("JL"),50,height/3+140);
          }else if(cate == 2){ // for school
-           
+           textSize(32);
+           fill(150,10,40);
+           text("School",50,height/3-30);
+           textSize(18);
+           text("E = "+cols.showWord("E"),50,height/3);
+           text("F = "+cols.showWord("F"),50,height/3+20);
+           text("G = "+cols.showWord("G"),50,height/3+40);
+           text("H = "+cols.showWord("H"),50,height/3+60);
+           text("EG = "+cols.showWord("EG"),50,height/3+80);
+           text("FH = "+cols.showWord("FH"),50,height/3+100);
+         }else if(cate == 3){ // for home
+           textSize(32);
+           fill(150,10,40);
+           text("House",50,height/3-30);
+           textSize(18);
+           text("A = "+cols.showWord("A"),50,height/3);
+           text("B = "+cols.showWord("B"),50,height/3+20);
+           text("C = "+cols.showWord("C"),50,height/3+40);
+           text("D = "+cols.showWord("D"),50,height/3+60);
+           text("AB = "+cols.showWord("AB"),50,height/3+80);
+           text("AC = "+cols.showWord("AC"),50,height/3+100);
+           text("AD = "+cols.showWord("AD"),50,height/3+120);
+           text("BA = "+cols.showWord("BA"),50,height/3+140);
+         }else if(cate == 4){ // for Goverment 
+           textSize(32);
+           fill(20,10,100);
+           text("Goverment place",50,height/3-30);
+           textSize(18);
+           text("M = "+cols.showWord("M"),50,height/3);
+           text("N = "+cols.showWord("N"),50,height/3+20);
+           text("O = "+cols.showWord("O"),50,height/3+40);
+           text("MM = "+cols.showWord("MM"),50,height/3+60);
+           text("MN = "+cols.showWord("MN"),50,height/3+80);
+           text("MO = "+cols.showWord("MO"),50,height/3+100);
+           text("NM = "+cols.showWord("NM"),50,height/3+120);
+         }
+         image(swipL,10,height/2,20,20);
+         if(dist(red(examplePic2),blue(examplePic2),green(examplePic2),red(examplePic11),blue(examplePic11),green(examplePic11)) > 30){
+           cate++;
+           if(cate == 4)
+             cate = 1;
          }
      }
       if(m1.choice(video,prev,2) == 2 || examVI == 2){
        examVI = 2;
          image(exampleImg1,width/10,height/3,200,200);
          image(exampleImg2,width/5,2*height/3+20,50,50);
-         color examplePic2 = video.pixels[width/5 + (2*height/3+50)*video.width];
-         if(dist(red(examplePic2),blue(examplePic2),green(examplePic2),red(examplePic1),blue(examplePic2),green(examplePic2)) > 20){
+         examplePic2 = video.pixels[width/5 + (2*height/3+50)*video.width];
+         if(dist(red(examplePic2),blue(examplePic2),green(examplePic2),red(examplePic1),blue(examplePic1),green(examplePic1)) > 20){
            exampleImg1 = loadImage("examples/"+exmKey+".jpeg");
            exmKey++;
            if(exmKey == 'P')
